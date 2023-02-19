@@ -15,3 +15,7 @@ if ($conn->connect_error) {
 }
 
 require('functions.php');
+
+
+// Tables
+$TBL_USERS ='members';

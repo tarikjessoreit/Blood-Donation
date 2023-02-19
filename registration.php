@@ -1,5 +1,16 @@
 <?php require('config.php'); ?>
 <?php
+    if(isset($_SESSION['loginestatus']) && $_SESSION['loginestatus'] === true){
+        header('location:index.php');
+    }
+
+    
+
+    $pass = password_hash("123",PASSWORD_DEFAULT);
+
+    echo $pass;
+?>
+<?php
 if (isset($_POST['regbtn'])) {
 
     $added_datetime = date('Y-m-d H:i:s');
@@ -8,17 +19,29 @@ if (isset($_POST['regbtn'])) {
     $phone_no = $_POST['ucontact'];
     $bloodgroup = $_POST['bloodgroup'];
     $email = $_POST['uname'];
-    $password = $_POST['upass'];
-    $profile_pic_path = "assets/images/member-profile-pic/";
+    $password = md5($_POST['upass']);
+    $cupass = md5($_POST['cupass']);
+    $profile_pic_path = "assets/images/profile_pics/";
     $user_status = "active";
 
-    $sql = "INSERT INTO members( added_datetime, fullname, address, phone_no, bloodgroup, email, password, profile_pic_path, user_status) VALUES ('$added_datetime', '$fullname', '$address', '$phone_no', '$bloodgroup', '$email', '$password', '$profile_pic_path', '$user_status')";
+    if($password === $cupass){
+        $sql = "INSERT INTO $TBL_USERS( added_datetime, fullname, address, phone_no, bloodgroup, email, password, profile_pic_path, user_status) VALUES ('$added_datetime', '$fullname', '$address', '$phone_no', '$bloodgroup', '$email', '$password', '$profile_pic_path', '$user_status')";
 
-    if ($conn->query($sql) === true) {
-        $msg = "Registration Successfull";
-    } else {
-        $err = "Registration Faild. Please Try Again. " . $conn->error;
+        if ($conn->query($sql) === true) {
+            $msg = "Registration Successfull";
+            
+            // profile picture upload code
+            $file_tmp_name = $_FILES["profilepic"]["tmp_name"];
+            $file_path = "assets/images/profile_pics/$email.png";
+            move_uploaded_file($file_tmp_name, $file_path);
+        } else {
+            $err = "Registration Faild. Please Try Again. " . $conn->error;
+        }
+    }else{
+        $err = "Password is not match. Please try again";
     }
+
+  
 
 }
 
@@ -43,8 +66,8 @@ if (isset($_POST['regbtn'])) {
         <div class="row">
             <div class="col-md-6 mx-auto">
                 <h1 class="mb-3 text-center">Signup</h1>
-                <!-- login form -->
 
+                <!-- Show status with alert-->
                 <?php if (isset($msg)) { ?>
                     <div class="alert alert-success" role="alert">
                         <?php echo $msg ?>
@@ -55,6 +78,7 @@ if (isset($_POST['regbtn'])) {
                     echo '<div class="alert alert-danger" role="alert">' . $err . '</div>';
                 } ?>
 
+                <!-- login form -->
                 <form class="was-validated" method="post" enctype="multipart/form-data">
                     <!-- name input -->
                     <div class="form-outline mb-4">

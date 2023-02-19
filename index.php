@@ -34,7 +34,7 @@
             <h2 class="text-center mb-4">Search Result</h2>
 
             <?php
-            $sql = "SELECT * FROM members WHERE bloodgroup = '$bloodgroup'";
+            $sql = "SELECT * FROM $TBL_USERS WHERE bloodgroup = '$bloodgroup'";
             $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
